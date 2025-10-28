@@ -1,0 +1,501 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kepco.app.domain.ntt.mapper.NttQueryMapper">
+
+    <resultMap id="detailMap"
+               type="com.kepco.app.domain.ntt.dto.SearchMberNtt$NttDetail">
+        <id property="id" column="NTT_ID" />
+        <result property="rdcnt" column="RDCNT" />
+        <result property="nttSj" column="NTT_SJ" />
+        <result property="nttCn" column="NTT_CN" />
+        <result property="frstRegistDt" column="FRST_REGIST_DT" />
+        <result property="wrterNm" column="WRTER_NM" />
+        <result property="secret" column="SECRET" />
+        <result property="notice" column="NOTICE" />
+        <result property="mine" column="MINE" />
+        <result property="anonymousWriter" column="ANONYMOUS_WRITER" />
+        <result property="password" column="PASSWORD" />
+        <result property="startDt" column="START_DT" />
+        <result property="endDt" column="END_DT" />
+        <association
+                property="replyDetail"
+                javaType="com.kepco.app.domain.ntt.dto.SearchMberNtt$ReplyDetail">
+            <id property="id" column="REPLY_NTT_ID" />
+            <result property="nttSj" column="REPLY_NTT__SJ" />
+            <result property="nttCn" column="REPLY_NTT_CN" />
+            <result property="frstRegistDt" column="REPLY_FRST_REGIST_DT" />
+            <result property="wrterNm" column="REPLY_WRTER_NM" />
+            <collection property="files"
+                        ofType="com.kepco.app.domain.ntt.dto.SearchMberNtt$FileInfo">
+                <id property="id" column="REPLY_ATCH_FILE_ID" />
+                <result property="name" column="REPLY_FILE_NM" />
+            </collection>
+        </association>
+        <collection
+                property="files"
+                ofType="com.kepco.app.domain.ntt.dto.SearchMberNtt$FileInfo">
+            <id property="id" column="ATCH_FILE_ID" />
+            <result property="name" column="FILE_NM" />
+        </collection>
+    </resultMap>
+
+    <select id="selectList" parameterType="HashMap" resultType="HashMap">
+        SELECT 
+			A.NTT_ID AS board_no, 
+			A.BBS_ID,
+			EXISTS(SELECT 1 FROM VST_NTT D WHERE D.PARNTSCTT_ID = A.NTT_ID) PARNTSCTT_ID,
+			A.NTT_SJ AS board_title, 
+			A.RDCNT,
+            A.SECRET_AT,
+            A.NOTICE_AT,
+			A.NTT_CN AS board_content, 
+			A.NTT_STTS AS board_status, 
+			DATE_FORMAT(A.FRST_REGIST_DT,'%Y-%m-%d') insert_dt,
+			A.FRST_REGISTER_ID AS insert_id, 
+			DATE_FORMAT(A.LAST_UPDT_DT,'%Y-%m-%d') update_dt,
+			A.LAST_UPDUSR_ID AS update_id,
+			(SELECT ATCH_FILE_ID FROM VST_ATCHFILE T WHERE T.UPPER_ID = A.NTT_ID ORDER BY ATCH_FILE_ID LIMIT 1) AS atch_file_id,
+			IFNULL(B.ORIGNL_FILE_NM, '') file_name,
+			C.FILE_AT,
+			C.CARD_AT
+		FROM VST_NTT A  
+		LEFT OUTER JOIN VST_ATCHFILE B ON A.NTT_ID = B.UPPER_ID AND B.FILE_SE = 'thumb'
+		LEFT OUTER JOIN VST_BBS C ON A.BBS_ID = C.BBS_ID
+		WHERE 1 = 1
+		  AND A.BBS_ID = #{board_type}
+		  AND A.USE_AT = 'Y'
+	   <if test="sSearch != null and sSearch != ''">
+			  and (A.NTT_SJ like CONCAT('%', #{sSearch}, '%') 
+			  	or A.NTT_CN like CONCAT('%', #{sSearch}, '%')
+			  )
+		</if>
+		<if test="orderCol != null and orderCol != ''">
+			order by ${orderCol} ${sSortDir_0},A.NTT_ID desc
+		</if>
+		<!-- <if test="orderCol == null and orderCol == ''"> -->
+			order by A.NTT_ID desc
+		<!-- </if> -->
+		<if test="iDisplayStart != null and iDisplayStart != '' and iDisplayLength != null and iDisplayLength != ''">
+			limit ${iDisplayStart}, ${iDisplayLength}
+		</if>
+    </select>
+    
+    <select id="selectListCount" parameterType="HashMap" resultType="Integer">
+		SELECT count(C.NTT_ID)
+		FROM (
+		SELECT A.NTT_ID
+		FROM VST_NTT A  LEFT OUTER JOIN VST_ATCHFILE B ON A.NTT_ID = B.UPPER_ID AND B.FILE_SE = 'ntt'
+		WHERE A.BBS_ID = #{board_type}
+		  AND A.USE_AT = 'Y'
+	   <if test="sSearch != null and sSearch != ''">
+		   and (A.NTT_SJ like CONCAT('%', #{sSearch}, '%') 
+			  	or A.NTT_CN like CONCAT('%', #{sSearch}, '%')
+			  )
+		</if>
+		GROUP BY A.NTT_ID ) C
+	</select>
+
+    <select
+            id="selectNttList"
+            parameterType="com.kepco.app.domain.ntt.dto.SearchMberNtt$Search"
+            resultType="com.kepco.app.domain.ntt.dto.SearchMberNtt$NttInfo">
+        SELECT
+            VN.NTT_ID,
+            VN.NTT_SJ,
+            VN.WRTER_NM,
+            VN.THUMB_URL,
+            VN.FRST_REGIST_DT,
+            VN.RDCNT,
+            IF(VN.SECRET_AT = 'Y', TRUE, FALSE)       AS SECRET,
+            IF(VN.NOTICE_AT = 'Y', TRUE, FALSE)       AS NOTICE,
+            IF(REPLY.NTT_ID IS NOT NULL, TRUE, FALSE) AS REPLY
+        FROM VST_NTT VN
+        LEFT OUTER JOIN VST_NTT REPLY ON VN.NTT_ID = REPLY.PARNTSCTT_ID
+        WHERE VN.BBS_ID = #{bbsId} AND VN.PARNTSCTT_ID IS NULL AND VN.USE_AT = 'Y'
+        <if test="searchKeyword != null and searchKeyword != ''">
+            <choose>
+                <when test="searchCondition != null and searchCondition == 'title'">
+                    AND VN.NTT_SJ LIKE CONCAT('%', #{searchKeyword}, '%')
+                </when>
+                <when test="searchCondition != null and searchCondition == 'writer'">
+                    AND VN.WRTER_NM LIKE CONCAT('%', #{searchKeyword}, '%')
+                </when>
+                <otherwise>
+                    AND (VN.NTT_SJ LIKE CONCAT('%', #{searchKeyword}, '%') OR VN.WRTER_NM LIKE CONCAT('%', #{searchKeyword}, '%'))
+                </otherwise>
+            </choose>
+        </if>
+        ORDER BY VN.NTT_ID DESC
+        LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+    </select>
+
+    <select id="selectTotCnt"
+            parameterType="com.kepco.app.domain.ntt.dto.SearchMberNtt$Search"
+            resultType="int">
+        SELECT
+            COUNT(*)
+        FROM VST_NTT VN
+        LEFT OUTER JOIN VST_NTT REPLY ON VN.NTT_ID = REPLY.PARNTSCTT_ID
+        LEFT OUTER JOIN VST_MBR MBR ON VN.FRST_REGISTER_ID = MBR.MBR_ID
+        WHERE VN.BBS_ID = #{bbsId} AND VN.PARNTSCTT_ID IS NULL AND VN.USE_AT = 'Y'
+        <![CDATA[
+        AND (
+            SELECT COUNT(*) FROM VST_REPORT VR
+            WHERE VR.TARGET_TYPE = 'ntt' AND VR.TARGET_ID = VN.NTT_ID
+        ) <= 3
+        ]]>
+        <if test="frstRgstId != null and frstRgstId > 0">
+            AND NOT EXISTS (
+            SELECT 1 FROM VST_BLOCK VB
+            WHERE VB.TARGET_TYPE = 'ntt'
+            AND VB.TARGET_ID = VN.NTT_ID
+            AND VB.BLOCKER_ID = #{frstRgstId}
+            )
+        </if>
+        <if test="frstRgstId != null and frstRgstId > 0">
+            AND NOT EXISTS (
+            SELECT 1 FROM VST_BLOCK VB2
+            WHERE VB2.TARGET_TYPE = 'mbr'
+            AND VB2.TARGET_ID = VN.FRST_REGISTER_ID
+            AND VB2.BLOCKER_ID = #{frstRgstId}
+            )
+        </if>
+        <if test="frstRgstId != null and frstRgstId > 0">
+            AND NOT EXISTS (
+            SELECT 1 FROM VST_REPORT VR2
+            WHERE VR2.TARGET_TYPE = 'mbr'
+            AND VR2.TARGET_ID = VN.FRST_REGISTER_ID
+            AND VR2.REPORTER_ID = #{frstRgstId}
+            )
+        </if>
+        <if test="frstRgstId != null and frstRgstId > 0">
+            AND NOT EXISTS (
+            SELECT 1 FROM VST_REPORT VR2
+            WHERE VR2.TARGET_TYPE = 'ntt'
+            AND VR2.TARGET_ID = VN.NTT_ID
+            AND VR2.REPORTER_ID = #{frstRgstId}
+            )
+        </if>
+        <if test="searchKeyword != null and searchKeyword != ''">
+            <choose>
+                <when test="searchCondition != null and searchCondition == 'title'">
+                    AND VN.NTT_SJ LIKE CONCAT('%', #{searchKeyword}, '%')
+                </when>
+                <when test="searchCondition != null and searchCondition == 'writer'">
+                    AND VN.WRTER_NM LIKE CONCAT('%', #{searchKeyword}, '%')
+                </when>
+                <otherwise>
+                    AND (VN.NTT_SJ LIKE CONCAT('%', #{searchKeyword}, '%') OR VN.WRTER_NM LIKE CONCAT('%', #{searchKeyword}, '%'))
+                </otherwise>
+            </choose>
+        </if>
+    </select>
+
+    <select
+            id="selectDetail"
+            parameterType="map"
+            resultMap="detailMap">
+        SELECT
+            VN.NTT_ID,
+            VN.NTT_SJ,
+            VN.NTT_CN,
+            CAST(DATE_FORMAT(VN.FRST_REGIST_DT, '%Y-%m-%d') AS CHAR) AS FRST_REGIST_DT,
+            VN.WRTER_NM,
+            (VN.RDCNT + 1) RDCNT,
+            VN.START_DT,
+            VN.END_DT,
+            IF(VN.NOTICE_AT = 'Y', TRUE, FALSE)       AS NOTICE,
+            IF(VN.FRST_REGISTER_ID IS NULL, TRUE, FALSE) ANONYMOUS_WRITER,
+            VA.ATCH_FILE_ID,
+            CONCAT(VA.ORIGNL_FILE_NM, '.' , VA.FILE_EXTSN) AS ORIGNL_FILE_NM
+        FROM VST_NTT VN
+        LEFT OUTER JOIN VST_ATCHFILE VA ON VN.NTT_ID = VA.UPPER_ID
+        WHERE VN.NTT_ID = #{nttId} AND VN.USE_AT = 'Y'
+    </select>
+
+    <select id="selectPreAndNext"
+            parameterType="map"
+            resultType="com.kepco.app.domain.ntt.dto.SearchMberNtt$PreNext">
+     	<![CDATA[       
+            (
+			  SELECT 
+			      NTT_ID, NTT_SJ, 'prev' AS VIEW_TYPE
+			  FROM (
+			    SELECT 
+			        NTT_ID, NTT_SJ
+			    FROM VST_NTT
+			    WHERE BBS_ID = #{bbsId}
+			      AND USE_AT = 'Y'
+			      AND NTT_ID < #{nttId}
+			    ORDER BY NTT_ID DESC
+			    LIMIT 1
+			  ) t1
+			)
+			UNION ALL
+			(
+			  SELECT 
+			      NTT_ID, NTT_SJ, 'next' AS VIEW_TYPE
+			  FROM (
+			    SELECT 
+			        NTT_ID, NTT_SJ
+			    FROM VST_NTT
+			    WHERE BBS_ID = #{bbsId}
+			      AND USE_AT = 'Y'
+			      AND NTT_ID > #{nttId}
+			    ORDER BY NTT_ID ASC
+			    LIMIT 1
+			  ) t2
+			)
+		]]>		            
+    </select>
+    
+    <select id="selectPreAndNext_origin"
+            parameterType="map"
+            resultType="com.kepco.app.domain.ntt.dto.SearchMberNtt$PreNext">
+
+        SELECT
+            (SELECT NTT_ID
+             FROM VST_NTT VN
+             WHERE <![CDATA[ NTT_ID < #{nttId} ]]>
+               AND USE_AT = 'Y'
+               AND BBS_ID = (SELECT BBS_ID FROM VST_NTT WHERE NTT_ID = #{nttId})
+               AND PARNTSCTT_ID IS NULL
+            <if test="frstRgstId != null and frstRgstId > 0">
+            AND NOT EXISTS (
+            SELECT 1 FROM VST_BLOCK VB
+            WHERE VB.TARGET_TYPE = 'ntt'
+            AND VB.TARGET_ID = VN.NTT_ID
+            AND VB.BLOCKER_ID = #{frstRgstId}
+                 )
+            </if>
+            <if test="frstRgstId != null and frstRgstId > 0">
+                AND NOT EXISTS (
+                SELECT 1 FROM VST_BLOCK VB2
+                WHERE VB2.TARGET_TYPE = 'mbr'
+                AND VB2.TARGET_ID = VN.FRST_REGISTER_ID
+                AND VB2.BLOCKER_ID = #{frstRgstId}
+                )
+            </if>
+            <if test="frstRgstId != null and frstRgstId > 0">
+                AND NOT EXISTS (
+                SELECT 1 FROM VST_REPORT VR2
+                WHERE VR2.TARGET_TYPE = 'mbr'
+                AND VR2.TARGET_ID = VN.FRST_REGISTER_ID
+                AND VR2.REPORTER_ID = #{frstRgstId}
+                )
+            </if>
+            <if test="frstRgstId != null and frstRgstId > 0">
+                AND NOT EXISTS (
+                SELECT 1 FROM VST_REPORT VR2
+                WHERE VR2.TARGET_TYPE = 'ntt'
+                AND VR2.TARGET_ID = VN.NTT_ID
+                AND VR2.REPORTER_ID = #{frstRgstId}
+                )
+            </if>
+             ORDER BY NTT_ID DESC LIMIT 1) AS prev_id,
+            (SELECT NTT_SJ
+             FROM VST_NTT VN
+             WHERE NTT_ID <![CDATA[ < #{nttId} ]]>
+               AND USE_AT = 'Y'
+               AND BBS_ID = (SELECT BBS_ID FROM VST_NTT WHERE NTT_ID = #{nttId})
+               AND PARNTSCTT_ID IS NULL
+                <if test="frstRgstId != null and frstRgstId > 0">
+                    AND NOT EXISTS (
+                    SELECT 1 FROM VST_BLOCK VB
+                    WHERE VB.TARGET_TYPE = 'ntt'
+                    AND VB.TARGET_ID = VN.NTT_ID
+                    AND VB.BLOCKER_ID = #{frstRgstId}
+                    )
+                </if>
+                <if test="frstRgstId != null and frstRgstId > 0">
+                    AND NOT EXISTS (
+                    SELECT 1 FROM VST_BLOCK VB2
+                    WHERE VB2.TARGET_TYPE = 'mbr'
+                    AND VB2.TARGET_ID = VN.FRST_REGISTER_ID
+                    AND VB2.BLOCKER_ID = #{frstRgstId}
+                    )
+                </if>
+                <if test="frstRgstId != null and frstRgstId > 0">
+                    AND NOT EXISTS (
+                    SELECT 1 FROM VST_REPORT VR2
+                    WHERE VR2.TARGET_TYPE = 'mbr'
+                    AND VR2.TARGET_ID = VN.FRST_REGISTER_ID
+                    AND VR2.REPORTER_ID = #{frstRgstId}
+                    )
+                </if>
+                <if test="frstRgstId != null and frstRgstId > 0">
+                    AND NOT EXISTS (
+                    SELECT 1 FROM VST_REPORT VR2
+                    WHERE VR2.TARGET_TYPE = 'ntt'
+                    AND VR2.TARGET_ID = VN.NTT_ID
+                    AND VR2.REPORTER_ID = #{frstRgstId}
+                    )
+                </if>
+             ORDER BY NTT_ID DESC LIMIT 1) AS prev_sj,
+            (SELECT SECRET_AT
+             FROM VST_NTT VN
+             WHERE NTT_ID <![CDATA[ < #{nttId} ]]>
+               AND USE_AT = 'Y'
+               AND BBS_ID = (SELECT BBS_ID FROM VST_NTT WHERE NTT_ID = #{nttId})
+               AND PARNTSCTT_ID IS NULL
+                <if test="frstRgstId != null and frstRgstId > 0">
+                    AND NOT EXISTS (
+                    SELECT 1 FROM VST_BLOCK VB
+                    WHERE VB.TARGET_TYPE = 'ntt'
+                    AND VB.TARGET_ID = VN.NTT_ID
+                    AND VB.BLOCKER_ID = #{frstRgstId}
+                    )
+                </if>
+                <if test="frstRgstId != null and frstRgstId > 0">
+                    AND NOT EXISTS (
+                    SELECT 1 FROM VST_BLOCK VB2
+                    WHERE VB2.TARGET_TYPE = 'mbr'
+                    AND VB2.TARGET_ID = VN.FRST_REGISTER_ID
+                    AND VB2.BLOCKER_ID = #{frstRgstId}
+                    )
+                </if>
+                <if test="frstRgstId != null and frstRgstId > 0">
+                    AND NOT EXISTS (
+                    SELECT 1 FROM VST_REPORT VR2
+                    WHERE VR2.TARGET_TYPE = 'mbr'
+                    AND VR2.TARGET_ID = VN.FRST_REGISTER_ID
+                    AND VR2.REPORTER_ID = #{frstRgstId}
+                    )
+                </if>
+                <if test="frstRgstId != null and frstRgstId > 0">
+                    AND NOT EXISTS (
+                    SELECT 1 FROM VST_REPORT VR2
+                    WHERE VR2.TARGET_TYPE = 'ntt'
+                    AND VR2.TARGET_ID = VN.NTT_ID
+                    AND VR2.REPORTER_ID = #{frstRgstId}
+                    )
+                </if>
+             ORDER BY NTT_ID DESC LIMIT 1) AS prev_secret,
+            (SELECT NTT_ID
+             FROM VST_NTT VN
+             WHERE NTT_ID > <![CDATA[ #{nttId} ]]>
+               AND USE_AT = 'Y'
+               AND BBS_ID = (SELECT BBS_ID FROM VST_NTT WHERE NTT_ID = #{nttId})
+               AND PARNTSCTT_ID IS NULL
+        <if test="frstRgstId != null and frstRgstId > 0">
+            AND NOT EXISTS (
+            SELECT 1 FROM VST_BLOCK VB
+            WHERE VB.TARGET_TYPE = 'ntt'
+            AND VB.TARGET_ID = VN.NTT_ID
+            AND VB.BLOCKER_ID = #{frstRgstId}
+            )
+        </if>
+        <if test="frstRgstId != null and frstRgstId > 0">
+            AND NOT EXISTS (
+            SELECT 1 FROM VST_BLOCK VB2
+            WHERE VB2.TARGET_TYPE = 'mbr'
+            AND VB2.TARGET_ID = VN.FRST_REGISTER_ID
+            AND VB2.BLOCKER_ID = #{frstRgstId}
+            )
+        </if>
+        <if test="frstRgstId != null and frstRgstId > 0">
+            AND NOT EXISTS (
+            SELECT 1 FROM VST_REPORT VR2
+            WHERE VR2.TARGET_TYPE = 'mbr'
+            AND VR2.TARGET_ID = VN.FRST_REGISTER_ID
+            AND VR2.REPORTER_ID = #{frstRgstId}
+            )
+        </if>
+        <if test="frstRgstId != null and frstRgstId > 0">
+            AND NOT EXISTS (
+            SELECT 1 FROM VST_REPORT VR2
+            WHERE VR2.TARGET_TYPE = 'ntt'
+            AND VR2.TARGET_ID = VN.NTT_ID
+            AND VR2.REPORTER_ID = #{frstRgstId}
+            )
+        </if>
+             ORDER BY NTT_ID LIMIT 1) AS next_id,
+            (SELECT NTT_SJ
+             FROM VST_NTT VN
+             WHERE NTT_ID > <![CDATA[ #{nttId} ]]>
+               AND USE_AT = 'Y'
+               AND BBS_ID = (SELECT BBS_ID FROM VST_NTT WHERE NTT_ID = #{nttId})
+               AND PARNTSCTT_ID IS NULL
+        <if test="frstRgstId != null and frstRgstId > 0">
+            AND NOT EXISTS (
+            SELECT 1 FROM VST_BLOCK VB
+            WHERE VB.TARGET_TYPE = 'ntt'
+            AND VB.TARGET_ID = VN.NTT_ID
+            AND VB.BLOCKER_ID = #{frstRgstId}
+            )
+        </if>
+        <if test="frstRgstId != null and frstRgstId > 0">
+            AND NOT EXISTS (
+            SELECT 1 FROM VST_BLOCK VB2
+            WHERE VB2.TARGET_TYPE = 'mbr'
+            AND VB2.TARGET_ID = VN.FRST_REGISTER_ID
+            AND VB2.BLOCKER_ID = #{frstRgstId}
+            )
+        </if>
+        <if test="frstRgstId != null and frstRgstId > 0">
+            AND NOT EXISTS (
+            SELECT 1 FROM VST_REPORT VR2
+            WHERE VR2.TARGET_TYPE = 'mbr'
+            AND VR2.TARGET_ID = VN.FRST_REGISTER_ID
+            AND VR2.REPORTER_ID = #{frstRgstId}
+            )
+        </if>
+        <if test="frstRgstId != null and frstRgstId > 0">
+            AND NOT EXISTS (
+            SELECT 1 FROM VST_REPORT VR2
+            WHERE VR2.TARGET_TYPE = 'ntt'
+            AND VR2.TARGET_ID = VN.NTT_ID
+            AND VR2.REPORTER_ID = #{frstRgstId}
+            )
+        </if>
+             ORDER BY NTT_ID LIMIT 1) AS next_sj,
+            (SELECT SECRET_AT
+             FROM VST_NTT VN
+             WHERE NTT_ID > <![CDATA[ #{nttId} ]]>
+               AND USE_AT = 'Y'
+               AND BBS_ID = (SELECT BBS_ID FROM VST_NTT WHERE NTT_ID = #{nttId})
+               AND PARNTSCTT_ID IS NULL
+        <if test="frstRgstId != null and frstRgstId > 0">
+            AND NOT EXISTS (
+            SELECT 1 FROM VST_BLOCK VB
+            WHERE VB.TARGET_TYPE = 'ntt'
+            AND VB.TARGET_ID = VN.NTT_ID
+            AND VB.BLOCKER_ID = #{frstRgstId}
+            )
+        </if>
+        <if test="frstRgstId != null and frstRgstId > 0">
+            AND NOT EXISTS (
+            SELECT 1 FROM VST_BLOCK VB2
+            WHERE VB2.TARGET_TYPE = 'mbr'
+            AND VB2.TARGET_ID = VN.FRST_REGISTER_ID
+            AND VB2.BLOCKER_ID = #{frstRgstId}
+            )
+        </if>
+        <if test="frstRgstId != null and frstRgstId > 0">
+            AND NOT EXISTS (
+            SELECT 1 FROM VST_REPORT VR2
+            WHERE VR2.TARGET_TYPE = 'mbr'
+            AND VR2.TARGET_ID = VN.FRST_REGISTER_ID
+            AND VR2.REPORTER_ID = #{frstRgstId}
+            )
+        </if>
+        <if test="frstRgstId != null and frstRgstId > 0">
+            AND NOT EXISTS (
+            SELECT 1 FROM VST_REPORT VR2
+            WHERE VR2.TARGET_TYPE = 'ntt'
+            AND VR2.TARGET_ID = VN.NTT_ID
+            AND VR2.REPORTER_ID = #{frstRgstId}
+            )
+        </if>
+             ORDER BY NTT_ID LIMIT 1) AS next_secret
+    </select>
+
+    <update id="updateViewCount" parameterType="Long">
+        UPDATE
+            VST_NTT
+        SET
+            RDCNT = RDCNT + 1
+        WHERE NTT_ID = #{nttId}
+    </update>
+
+</mapper>
