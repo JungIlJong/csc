@@ -35,8 +35,8 @@ public class JwtSecurityConfig {
     public SecurityFilterChain jwtSecurityFilterChain(HttpSecurity http) throws Exception {
         http
                 .requestMatcher(new OrRequestMatcher(
-                        new AntPathRequestMatcher("/api/mber/**"),
-                        new AntPathRequestMatcher("/mber/**"),
+                        new AntPathRequestMatcher("/api/ft/**"),
+                        new AntPathRequestMatcher("/ft/**"),
                         new AntPathRequestMatcher("/api/v1/**")
                 ))
                 .csrf(AbstractHttpConfigurer::disable)
@@ -69,7 +69,7 @@ public class JwtSecurityConfig {
                 "/**/*.png",
                 "/**/*.json",
                 "/file/**",
-                "/api/mber/popups/**",
+                "/api/ft/popups/**",
                 "/api/banners");
     }
 
@@ -88,7 +88,7 @@ public class JwtSecurityConfig {
                 "/**/*.png",
                 "/**/*.json",
                 "/file/**",
-                "/api/mber/popups/**",
+                "/api/ft/popups/**",
                 "/api/banners");
     }
 }

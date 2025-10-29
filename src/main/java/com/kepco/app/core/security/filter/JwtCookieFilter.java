@@ -117,7 +117,7 @@ public class JwtCookieFilter extends OncePerRequestFilter {
         for (String permitAll : permitAllList) {
             permitAllRequestMatchers.add(new AntPathRequestMatcher(permitAll));
         }
-        permitAllRequestMatchers.add(new RegexRequestMatcher("/api/mber/bbs/\\d+$", HttpMethod.GET.name()));
+        permitAllRequestMatchers.add(new RegexRequestMatcher("/api/ft/bbs/\\d+$", HttpMethod.GET.name()));
     }
 
     private void removeCookie(HttpServletResponse response, String cookieName) {

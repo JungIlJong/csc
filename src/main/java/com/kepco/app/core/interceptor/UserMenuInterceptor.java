@@ -1,5 +1,6 @@
 package com.kepco.app.core.interceptor;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -47,7 +48,22 @@ public class UserMenuInterceptor implements HandlerInterceptor {
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
         if (modelAndView != null) {
+        	String viewName = modelAndView.getViewName();
 
+            if (viewName == null ||
+                viewName.startsWith("redirect:") ||
+                viewName.startsWith("forward:")) return;
+            
+            if (viewName.startsWith("ft/pr") || viewName.startsWith("ft/pa") || viewName.startsWith("ft/off")) {
+	            String viewPath = "/WEB-INF/jsp/vasanta/" + viewName + ".jsp";
+	            String realPath = request.getServletContext().getRealPath(viewPath);
+	
+	            File jspFile = new File(realPath);
+	            if (!jspFile.exists()) {
+	            	modelAndView.setViewName("/cmmn/error404");
+	            }
+            }
+            
             String requestURI = request.getRequestURI();
             log.info("### requestURI: {}", requestURI);
             modelAndView.addObject("requestUri", requestURI);
@@ -61,12 +77,12 @@ public class UserMenuInterceptor implements HandlerInterceptor {
             for (Menu menu : menuList) {
                 if (menu.getUrl().contains(subRequestURI)) {
                     modelAndView.addObject("menuTitle", menu.getMenuNm());
+                    modelAndView.addObject("upperMenuId", menu.getUpperMenuId());
                     modelAndView.addObject("menuSj", menu.getMenuSj());
                 }
                 menuMap.put(menu.getMenuId(), menu);
             }
 
-            List<Menu> breadcrumb = new ArrayList<>();
             Menu currentMenu = null;
 
             for (Menu menu : menuList) {
@@ -93,14 +109,10 @@ public class UserMenuInterceptor implements HandlerInterceptor {
                 }
                 
         	    currentMenu.setUrl(resolvedUrl);
-        	    breadcrumb.add(currentMenu);
 
         	    Long upperId = currentMenu.getUpperMenuId();
         	    currentMenu = (upperId != null) ? menuMap.get(upperId) : null;
             }
-
-            Collections.reverse(breadcrumb);
-            modelAndView.addObject("breadcrumb", breadcrumb);
 
             if (!menuList.isEmpty()) {
                 modelAndView.addObject("menuItems", menuList.get(0));

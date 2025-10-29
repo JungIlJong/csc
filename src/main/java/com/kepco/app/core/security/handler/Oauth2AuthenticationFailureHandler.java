@@ -17,7 +17,7 @@ public class Oauth2AuthenticationFailureHandler  extends SimpleUrlAuthentication
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
-        String url = "/mber/support/login/login";
+        String url = "/ft/support/login/login";
         setDefaultFailureUrl(url);
         super.onAuthenticationFailure(request, response, exception);
     }

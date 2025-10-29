@@ -106,15 +106,15 @@ public class EgovWebMvcConfiguration implements WebMvcConfigurer {
 		registry.addInterceptor(rootMenuInterceptor()).addPathPatterns("/index", "/pop/search/all/**");
 
 		registry.addInterceptor(userMenuInterceptor())
-				.addPathPatterns("/mber/**")
-				.excludePathPatterns("/mber/css/**", "/mber/js/**", "/mber/assets/**", "/mber/fonts/**")
-				.excludePathPatterns("/api/**/login", "/mber/**/logout")
+				.addPathPatterns("/ft/**")
+				.excludePathPatterns("/ft/css/**", "/ft/js/**", "/ft/assets/**", "/ft/fonts/**")
+				.excludePathPatterns("/api/**/login", "/ft/**/logout")
 				.excludePathPatterns("/actuator/**", "/swagger-ui/**");
 
 //		registry.addInterceptor(settingInterceptor())
 //				.addPathPatterns("/**")
-//				.excludePathPatterns("/mber/css/**", "/mber/js/**", "/mber/assets/**", "/mber/fonts/**")
-//				.excludePathPatterns("/api/**/*", "/mber/**/logout");
+//				.excludePathPatterns("/ft/css/**", "/ft/js/**", "/ft/assets/**", "/ft/fonts/**")
+//				.excludePathPatterns("/api/**/*", "/ft/**/logout");
     }
 
     @Override
