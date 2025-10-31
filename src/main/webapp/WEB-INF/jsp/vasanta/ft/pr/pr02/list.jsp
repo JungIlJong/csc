@@ -662,17 +662,5 @@
 		</div>
 	</div> <!--  sub_content_box  -->
 </div>
-<!-- 페이지 스크롤시 페이드인 효과 하위 위치 필수  -->
-<link rel="stylesheet" href="/publish/ft/css/aos.css"/>
-<script type="text/javascript" src="/publish/ft/js/aos.js"></script>
-<script type="text/javascript">
-	$(window).load(function() {
-		$(".v_zoom").addClass('on');
-		$(".sub_tit").addClass('on');
-		AOS.init({
-			 once: false
-		});						
-	});
-</script> 
- </body>
+</body>
 </html>

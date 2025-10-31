@@ -40,7 +40,6 @@ document.addEventListener('DOMContentLoaded', function (e) {
         data: function (d) {
           d.minDate = $('#stDt').val();
           d.maxDate = $('#endDt').val();
-          d.bbsTyCode = $("#bbsTyCode").val();
           return d;
         }
       },
@@ -48,7 +47,6 @@ document.addEventListener('DOMContentLoaded', function (e) {
       columns: [
         // columns according to JSON
         { data: 'bbsId' },
-        { data: 'bbsTyCode'},
         { data: 'bbsNm' },
         { data: 'frstRegistDt' },
         { data: 'useAt' },
@@ -66,22 +64,6 @@ document.addEventListener('DOMContentLoaded', function (e) {
         },
         {
           targets: 1,
-          responsivePriority: 3,
-          title: '게시판유형',
-          searchable: false,
-          render: function (data, type, full, meta) {
-            switch (data) {
-              case 'BBS_ALBUM':
-                return '앨범형(사진)';
-              case 'BBS_QNA':
-                return '질문답변형';
-              default:
-                return '일반형(목록)';
-            }
-          }
-        },
-        {
-          targets: 2,
           title: '게시판명',
           render: function (data, type, full, meta) {
             return data;
@@ -89,7 +71,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
         },
         {
           // Plans
-          targets: 3,
+          targets: 2,
           title: '등록일시',
           searchable: false,
           render: function (data, type, full, meta) {
@@ -98,7 +80,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
         },
         {
           // Plans
-          targets: 4,
+          targets: 3,
           title: '사용여부',
           render: function (data, type, full, meta) {
             return data === 'Y' ? '<span class="badge text-bg-primary">사용</span>' : '<span class="badge text-bg-secondary">비활성</span>';

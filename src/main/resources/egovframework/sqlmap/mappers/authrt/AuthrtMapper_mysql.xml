@@ -126,19 +126,4 @@
 		</foreach>
 	</insert>
 
-	<insert id="insertMbrOrgAuthrtByUUID" parameterType="mbrOrg">
-		INSERT INTO VST_MBR_AUTHRT (MBR_ID, AUTHRT_ID)
-		VALUES
-		<foreach collection="authrtList" item="authrt" separator=",">
-			((SELECT MBR_ID FROM VST_MBR WHERE UUID = #{uuid}), #{authrt.authrtId})
-		</foreach>
-	</insert>
-
-	<insert id="insertMbrOrgAuthrtByMbrId" parameterType="mbrOrg">
-		INSERT INTO VST_MBR_AUTHRT (MBR_ID, AUTHRT_ID)
-		VALUES
-		<foreach collection="authrtList" item="authrt" separator=",">
-			(#{mbrId}, #{authrt.authrtId})
-		</foreach>
-	</insert>
 </mapper>

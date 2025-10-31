@@ -17,11 +17,5 @@ public class SearchBbs extends ComSearchVO {
     private int fileAtchSize;
     private int fileAtchCo;
     private String bbsNm;
-    private String bbsTyCode;
-    private String secretUseAt;
-    private String answerAt;
-    private String fileAt;
-    private String cardAt;
     private String permExtsn;
-    private String authorList;
 }

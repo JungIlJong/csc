@@ -1,4 +1,4 @@
-package com.kepco.app.home.controller;
+package com.kepco.app.domain.contents;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

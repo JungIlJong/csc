@@ -57,10 +57,8 @@ public class BbsSysServiceImpl extends EgovAbstractServiceImpl implements BbsSys
      * @throws FdlException
      */
     @Override
-    @Transactional
     public void insertBbs(SysBbs bbs) throws FdlException {
         bbsSysMapper.insertBbs(bbs);
-        bbsRoleSysMapper.insertBbsRole(bbs.getBbsId(), bbs.getRoles());
     }
 
     /**
@@ -69,11 +67,8 @@ public class BbsSysServiceImpl extends EgovAbstractServiceImpl implements BbsSys
      * @param bbs 게시판 DTO
      */
     @Override
-    @Transactional
     public void updateBbs(SysBbs bbs) {
         bbsSysMapper.updateBbs(bbs);
-        bbsRoleSysMapper.deleteBbsRole(bbs.getBbsId());
-        bbsRoleSysMapper.insertBbsRole(bbs.getBbsId(), bbs.getRoles());
     }
 
     /**
@@ -82,11 +77,8 @@ public class BbsSysServiceImpl extends EgovAbstractServiceImpl implements BbsSys
      * @param bbsId 삭제할 게시판 ID
      */
     @Override
-    @Transactional
     public void deleteBbsById(String bbsId) throws IOException {
         nttSysService.deleteByBbsId(bbsId);
-        bbsSysMapper.deleteBbsById(bbsId);
-        bbsRoleSysMapper.deleteBbsRole(bbsId);
     }
 
     /**

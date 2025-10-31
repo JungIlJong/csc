@@ -1054,13 +1054,6 @@ window.initFvBbs = function () {
                     }
                 }
             },
-            bbsTyCode: {
-                validators: {
-                    notEmpty: {
-                        message: msg.bbsTyCodeRequired
-                    }
-                }
-            },
             fileAtchCo: {
                 validators: {
                     callback: {

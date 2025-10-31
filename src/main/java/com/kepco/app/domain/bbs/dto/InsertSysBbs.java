@@ -39,12 +39,6 @@ public class InsertSysBbs {
     private String bbsNm;
 
     /**
-     * 게시판타입코드
-     */
-    @NotBlank(message = "{bbs.bbsTyCode.notblank}")
-    private String bbsTyCode;
-
-    /**
      * 첨부파일사이즈
      */
     @Max(value = 50, message = "{bbs.fileAtchSize.max}")
@@ -61,20 +55,4 @@ public class InsertSysBbs {
      */
     @NotBlank(message = "{bbs.permExtsn.size}")
     private String permExtsn;
-
-    /**
-     * 권한목록
-     */
-    @NotNull(message = "{bbs.roles.nonnull}")
-    private List<Map<String, Object>> roles;
-    
-    /**
-     * 첨부파일 표시여부
-     */
-    private String fileAt;
-    
-    /**
-     * 카드형목록 여부
-     */
-    private String cardAt;
 }

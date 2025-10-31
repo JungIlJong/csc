@@ -91,24 +91,6 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="col-6">
-                                                    <div class="form-control-validation fv-plugins-icon-container">
-                                                        <label class="form-label" for="bbsTyCode">게시판 유형</label>
-                                                        <select class="form-control form-select" id="bbsTyCode"
-                                                                name="bbsTyCode">
-                                                            <option selected value=""><spring:message
-                                                                    code="bbs.bbsTyCode.all"/></option>
-                                                            <option value="BBS_DEFAULT"><spring:message
-                                                                    code="bbs.bbsTyCode.default"/></option>
-                                                            <option value="BBS_ALBUM"><spring:message
-                                                                    code="bbs.bbsTyCode.album"/></option>
-                                                            <option value="BBS_QNA"><spring:message
-                                                                    code="bbs.bbsTyCode.qna"/></option>
-                                                            <option value="BBS_DOWNLOAD"><spring:message
-                                                                    code="bbs.bbsTyCode.download"/></option>
-                                                        </select>
-                                                    </div>
-                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -139,7 +121,7 @@
     $(function () {
         let dt_bbs = new DataTable('.datatables-bbs');
         // Refilter the table
-        document.querySelectorAll('#stDt, #endDt, #bbsTyCode').forEach((el) => {
+        document.querySelectorAll('#stDt, #endDt').forEach((el) => {
             el.addEventListener('change', () => dt_bbs.draw());
         });
 

@@ -5,7 +5,6 @@ import java.util.Map;
 
 import com.kepco.app.domain.authrt.dto.Authrt;
 import com.kepco.app.domain.mbr.dto.Mbr;
-import com.kepco.app.domain.mbrOrg.dto.MbrOrg;
 
 public interface AuthrtService {
     List<Authrt> selectAuthrtList(Map<String, Object> searchMap);
@@ -27,8 +26,4 @@ public interface AuthrtService {
     void insertMbrAuthrtByUUID(Mbr mbr);
 
     void insertMbrAuthrtByMbrId(Mbr mbr);
-
-    void insertMbrOrgAuthrtByUUID(MbrOrg mbrorg);
-
-    void insertMbrOrgAuthrtByMbrId(MbrOrg mbrorg);
 }

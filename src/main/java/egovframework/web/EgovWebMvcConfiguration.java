@@ -1,32 +1,30 @@
 package egovframework.web;
 
-import com.kepco.app.core.interceptor.MenuInterceptor;
-import com.kepco.app.core.interceptor.RootMenuInterceptor;
-import com.kepco.app.core.interceptor.SettingInterceptor;
-import com.kepco.app.core.interceptor.UserMenuInterceptor;
-import com.kepco.app.domain.accesslog.mapper.AccessLogMapper;
-import com.kepco.app.domain.bbs.service.BbsRoleService;
-import com.kepco.app.domain.bbs.service.BbsRoleSysService;
-import com.kepco.app.domain.menu.mapper.MenuSysMapper;
-import com.kepco.app.domain.setting.service.SettingSysService;
-import com.navercorp.lucy.security.xss.servletfilter.XssEscapeServletFilter;
-import egovframework.cmmn.web.EgovBindingInitializer;
-import lombok.RequiredArgsConstructor;
+import java.util.concurrent.TimeUnit;
+
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.http.CacheControl;
 import org.springframework.web.filter.CharacterEncodingFilter;
-import org.springframework.web.servlet.config.annotation.*;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
-import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.JstlView;
 import org.springframework.web.servlet.view.UrlBasedViewResolver;
 
-import java.util.concurrent.TimeUnit;
+import com.kepco.app.core.interceptor.MenuInterceptor;
+import com.kepco.app.core.interceptor.RootMenuInterceptor;
+import com.kepco.app.core.interceptor.UserMenuInterceptor;
+import com.kepco.app.domain.accesslog.mapper.AccessLogMapper;
+import com.kepco.app.domain.menu.mapper.MenuSysMapper;
+import com.navercorp.lucy.security.xss.servletfilter.XssEscapeServletFilter;
+
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Configuration
@@ -35,12 +33,6 @@ public class EgovWebMvcConfiguration implements WebMvcConfigurer {
 	private final MenuSysMapper menuSysMapper;
 
 	private final AccessLogMapper accessLogMapper;
-
-	private final SettingSysService settingSysService;
-
-	private final BbsRoleService bbsRoleService;
-
-	private final BbsRoleSysService bbsRoleSysService;
 
 	@Override
 	public void addViewControllers(ViewControllerRegistry registry) {
@@ -86,11 +78,6 @@ public class EgovWebMvcConfiguration implements WebMvcConfigurer {
 		return new UserMenuInterceptor(menuSysMapper);
 	}
 
-	@Bean
-	public SettingInterceptor settingInterceptor() {
-		return new SettingInterceptor(settingSysService);
-	}
-
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(localeChangeInterceptor());
@@ -111,10 +98,6 @@ public class EgovWebMvcConfiguration implements WebMvcConfigurer {
 				.excludePathPatterns("/api/**/login", "/ft/**/logout")
 				.excludePathPatterns("/actuator/**", "/swagger-ui/**");
 
-//		registry.addInterceptor(settingInterceptor())
-//				.addPathPatterns("/**")
-//				.excludePathPatterns("/ft/css/**", "/ft/js/**", "/ft/assets/**", "/ft/fonts/**")
-//				.excludePathPatterns("/api/**/*", "/ft/**/logout");
     }
 
     @Override

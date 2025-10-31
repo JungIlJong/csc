@@ -1,5 +1,8 @@
 package com.kepco.app.domain.authrt.service.impl;
 
+import java.util.List;
+import java.util.Map;
+
 import org.egovframe.rte.fdl.cmmn.EgovAbstractServiceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -8,11 +11,7 @@ import com.kepco.app.domain.authrt.dto.Authrt;
 import com.kepco.app.domain.authrt.mapper.AuthrtMapper;
 import com.kepco.app.domain.authrt.service.AuthrtService;
 import com.kepco.app.domain.mbr.dto.Mbr;
-import com.kepco.app.domain.mbrOrg.dto.MbrOrg;
 import com.kepco.app.domain.menu.dto.Menu;
-
-import java.util.List;
-import java.util.Map;
 
 @Service("authrtService")
 public class AuthrtServiceImpl extends EgovAbstractServiceImpl implements AuthrtService {
@@ -83,15 +82,5 @@ public class AuthrtServiceImpl extends EgovAbstractServiceImpl implements Authrt
     @Override
     public void insertMbrAuthrtByMbrId(Mbr mbr) {
         authrtMapper.insertMbrAuthrtByMbrId(mbr);
-    }
-
-    @Override
-    public void insertMbrOrgAuthrtByUUID(MbrOrg mbrorg) {
-        authrtMapper.insertMbrOrgAuthrtByUUID(mbrorg);
-    }
-
-    @Override
-    public void insertMbrOrgAuthrtByMbrId(MbrOrg mbrorg) {
-        authrtMapper.insertMbrOrgAuthrtByMbrId(mbrorg);
     }
 }

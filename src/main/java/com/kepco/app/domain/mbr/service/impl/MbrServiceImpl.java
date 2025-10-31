@@ -2,7 +2,6 @@ package com.kepco.app.domain.mbr.service.impl;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -14,11 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import com.kepco.app.core.security.util.UserDetailsUtil;
 import com.kepco.app.domain.authrt.dto.Authrt;
 import com.kepco.app.domain.authrt.service.AuthrtService;
-import com.kepco.app.domain.block.dto.BlockRequest;
-import com.kepco.app.domain.block.service.BlockService;
 import com.kepco.app.domain.mbr.dto.Mbr;
 import com.kepco.app.domain.mbr.mapper.MbrMapper;
 import com.kepco.app.domain.mbr.service.MbrService;
@@ -34,8 +30,6 @@ public class MbrServiceImpl extends EgovAbstractServiceImpl implements MbrServic
     private final PasswordEncoder passwordEncoder;
 
     private final AuthrtService authrtService;
-
-    private final BlockService blockService;
 
     private final String path = "mbr";
 
@@ -118,61 +112,9 @@ public class MbrServiceImpl extends EgovAbstractServiceImpl implements MbrServic
         mbrMapper.deleteMbr(uuid);
     }
 
-    @Override
-    public void updateMbrLock(String uuid) {
-        mbrMapper.updateMbrLock(uuid);
-    }
-
-    @Override
-    public List<Mbr> selectMbrPushList(Map<String, Object> searchMap) {
-        return mbrMapper.selectMbrPushList(searchMap);
-    }
-
-    @Override
-    public int selectMbrPushListTotCnt(Map<String, Object> searchMap) {
-        return mbrMapper.selectMbrPushListTotCnt(searchMap);
-    }
-
-    @Override
-    public List<Mbr> selectMbrPushListAll(Map<String, Object> searchMap) {
-        return mbrMapper.selectMbrPushListAll(searchMap);
-    }
-
 
     @Override
     public int countMbrByEmail(Map<String, Object> searchMap) {
         return mbrMapper.countMbrByEmail(searchMap);
-    }
-
-    @Transactional
-    @Override
-    public void withDrawMbr(String uuid) {
-        mbrMapper.withDrawByUuid(uuid);
-
-    }
-
-    @Override
-    @Transactional
-    public void reportMbr(Long frstRgstId) {
-        Map<String, Object> reportMap = new HashMap<>();
-        reportMap.put("frstRgstId", frstRgstId);
-        reportMap.put("mbrId", UserDetailsUtil.getMbrId());
-        mbrMapper.reportMbr(reportMap);
-        blockMbr(frstRgstId);
-    }
-
-    @Override
-    @Transactional
-    public void blockMbr(Long frstRgstId) {
-        blockService.insertBlock(BlockRequest.builder()
-                .blockerId(Long.valueOf(UserDetailsUtil.getMbrId()))
-                .targetId(frstRgstId)
-                .targetType(path)
-                .build());
-    }
-
-    @Override
-    public void updateMbrReportIds(String uuid) {
-        mbrMapper.updateMbrReportIds(uuid);
     }
 }

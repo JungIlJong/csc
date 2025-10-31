@@ -44,12 +44,6 @@ public class UpdateSysBbs {
     private String bbsNm;
 
     /**
-     * 게시판타입코드
-     */
-    @NotBlank(message = "{bbs.update.bbsTyCode.notblank}")
-    private String bbsTyCode;
-
-    /**
      * 첨부파일사이즈
      */
     @NotNull(message = "{bbs.insert.fileAtchAt.notblank}")
@@ -66,22 +60,7 @@ public class UpdateSysBbs {
     @NotBlank(message = "{bbs.permExtsn.size}")
     private String permExtsn;
 
-    /**
-     * 권한목록
-     */
-    @NotNull(message = "{bbs.update.roles.nonnull}")
-    private List<Map<String, Object>> roles;
-
     @NotBlank(message = "{bbs.update.useAt.notblank}")
     private String useAt;
 
-    /**
-     * 첨부파일 표시여부
-     */
-    private String fileAt;
-    
-    /**
-     * 카드형목록 여부
-     */
-    private String cardAt;
 }

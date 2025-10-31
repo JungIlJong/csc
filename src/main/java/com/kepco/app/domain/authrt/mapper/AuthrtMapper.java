@@ -1,14 +1,13 @@
 package com.kepco.app.domain.authrt.mapper;
 
+import java.util.List;
+import java.util.Map;
+
 import org.egovframe.rte.psl.dataaccess.mapper.Mapper;
 
 import com.kepco.app.domain.authrt.dto.Authrt;
 import com.kepco.app.domain.mbr.dto.Mbr;
-import com.kepco.app.domain.mbrOrg.dto.MbrOrg;
 import com.kepco.app.domain.menu.dto.Menu;
-
-import java.util.List;
-import java.util.Map;
 
 @Mapper("authrtMapper")
 public interface AuthrtMapper {
@@ -43,8 +42,4 @@ public interface AuthrtMapper {
     void insertMbrAuthrtByUUID(Mbr mbr);
 
     void insertMbrAuthrtByMbrId(Mbr mbr);
-
-    void insertMbrOrgAuthrtByMbrId(MbrOrg mbrorg);
-
-    void insertMbrOrgAuthrtByUUID(MbrOrg mbrorg);
 }

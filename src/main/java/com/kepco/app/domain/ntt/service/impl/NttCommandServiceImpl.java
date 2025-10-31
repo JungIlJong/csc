@@ -13,8 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.kepco.app.core.security.util.UserDetailsUtil;
 import com.kepco.app.domain.atchfile.dto.InsertAtchFile;
 import com.kepco.app.domain.atchfile.service.FileService;
-import com.kepco.app.domain.block.dto.BlockRequest;
-import com.kepco.app.domain.block.service.BlockService;
 import com.kepco.app.domain.ntt.dto.MberNtt;
 import com.kepco.app.domain.ntt.mapper.NttCommandMapper;
 import com.kepco.app.domain.ntt.service.NttCommandService;
@@ -30,8 +28,6 @@ public class NttCommandServiceImpl extends EgovAbstractServiceImpl implements Nt
     private final FileService fileService;
 
     private final PasswordEncoder passwordEncoder;
-
-    private final BlockService blockService;
 
     private final String path = "ntt";
 
@@ -106,15 +102,5 @@ public class NttCommandServiceImpl extends EgovAbstractServiceImpl implements Nt
                 ntt.setThumbUrl(String.format("/file/%s", fileId));
             }
         }
-    }
-
-    @Override
-    @Transactional
-    public void blockNtt(Long nttId) {
-        blockService.insertBlock(BlockRequest.builder()
-                .targetId(nttId)
-                .targetType(path)
-                .blockerId(Long.valueOf(UserDetailsUtil.getMbrId()))
-                .build());
     }
 }

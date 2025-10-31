@@ -50,7 +50,6 @@ function bbsDtLoad(e) {
                 // columns according to JSON
                 {data: 'bbsId'},
                 {data: 'bbsId'},
-                {data: 'bbsTyCode'},
                 {data: 'bbsNm'},
                 {data: 'frstRegistDt'},
             ],
@@ -78,21 +77,13 @@ function bbsDtLoad(e) {
                 {
                     targets: 2,
                     orderable: false,
-                    title: '타입',
-                    render: function (data, type, full, meta) {
-                        return data;
-                    }
-                },
-                {
-                    targets: 3,
-                    orderable: false,
                     title: '게시판명',
                     render: function (data, type, full, meta) {
                         return data;
                     }
                 },
                 {
-                    targets: 4,
+                    targets: 3,
                     orderable: false,
                     title: '등록일자',
                     render: function (data, type, full, meta) {
@@ -101,7 +92,7 @@ function bbsDtLoad(e) {
                 }
             ],
             select: false,
-            order: [[4, 'desc']],
+            order: [[3, 'desc']],
             layout: {
                 topStart: {
                     rowClass: 'row mx-3 my-0 justify-content-between',
@@ -188,52 +179,6 @@ function bbsDtLoad(e) {
                                         {
                                             extend: 'excel',
                                             text: `<span class="d-flex align-items-center"><i class="icon-base bx bxs-file-export me-2"></i>Excel</span>`,
-                                            className: 'dropdown-item',
-                                            exportOptions: {
-                                                columns: [0, 1, 2, 3, 4],
-                                                format: {
-                                                    body: function (inner, coldex, rowdex) {
-                                                        if (inner.length <= 0) return inner;
-                                                        const el = new DOMParser().parseFromString(inner, 'text/html').body.childNodes;
-                                                        let result = '';
-                                                        el.forEach(item => {
-                                                            if (item.classList && item.classList.contains('user-name')) {
-                                                                result += item.lastChild.firstChild.textContent;
-                                                            } else {
-                                                                result += item.textContent || item.innerText || '';
-                                                            }
-                                                        });
-                                                        return result;
-                                                    }
-                                                }
-                                            }
-                                        },
-                                        {
-                                            extend: 'pdf',
-                                            text: `<span class="d-flex align-items-center"><i class="icon-base bx bxs-file-pdf me-2"></i>Pdf</span>`,
-                                            className: 'dropdown-item',
-                                            exportOptions: {
-                                                columns: [0, 1, 2, 3, 4],
-                                                format: {
-                                                    body: function (inner, coldex, rowdex) {
-                                                        if (inner.length <= 0) return inner;
-                                                        const el = new DOMParser().parseFromString(inner, 'text/html').body.childNodes;
-                                                        let result = '';
-                                                        el.forEach(item => {
-                                                            if (item.classList && item.classList.contains('user-name')) {
-                                                                result += item.lastChild.firstChild.textContent;
-                                                            } else {
-                                                                result += item.textContent || item.innerText || '';
-                                                            }
-                                                        });
-                                                        return result;
-                                                    }
-                                                }
-                                            }
-                                        },
-                                        {
-                                            extend: 'copy',
-                                            text: `<i class="icon-base bx bx-copy me-1"></i>복사`,
                                             className: 'dropdown-item',
                                             exportOptions: {
                                                 columns: [0, 1, 2, 3, 4],

@@ -41,11 +41,6 @@ public class SysBbs {
     private String bbsNm;
 
     /**
-     * 게시판타입코드
-     */
-    private String bbsTyCode;
-
-    /**
      * 파일사이즈
      */
     private int fileAtchSize;
@@ -55,24 +50,9 @@ public class SysBbs {
     private int fileAtchCo;
 
     /**
-     *
-     */
-    private String secretUseAt;
-
-    /**
-     * 댓글여부
-     */
-    private String answerAt;
-
-    /**
      * 사용여부
      */
     private String useAt;
-
-    /**
-     * 답글여부
-     */
-    private String replyAt;
 
     /**
      * 허용확장자
@@ -98,19 +78,4 @@ public class SysBbs {
      * 최종수정일시
      */
     private LocalDateTime lastUpdtDt;
-    
-    /**
-     * 권한목록
-     */
-    private List<Map<String, Object>> roles;
-
-    /**
-     * 첨부파일 표시여부
-     */
-    private String fileAt;
-
-    /**
-     * 카드형목록 여부
-     */
-    private String cardAt;
 }

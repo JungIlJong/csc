@@ -182,7 +182,6 @@
                 headNode = `<tr>
                                 <th class="tblHeaderItem check"></th>
                                 <th class="tblHeaderItem item01">게시판ID</th>
-                                <th class="tblHeaderItem item01">타입</th>
                                 <th class="tblHeaderItem tit">게시판명</th>
                                 <th class="tblHeaderItem item02">등록일자</th>
                              </tr>`;
@@ -207,7 +206,6 @@
                     bodyNode = `<tr>
                                     <td class="tblBodyItem check"><input type="radio" name="checkRadio" value="${'${element.bbsId}'}"/></td>
                                     <td class="tblBodyItem item01">${'${element.bbsId}'}</td>
-                                    <td class="tblBodyItem item01">${'${element.bbsTyCode}'}</td>
                                     <td class="tblBodyItem tit">${'${element.bbsNm}'}</td>
                                     <td class="tblBodyItem item02">${'${element.frstRegistDt}'}</td>
                                 </tr>`;
@@ -880,17 +878,17 @@
 
             let menuTy = document.querySelector('input[name=menuTy]:checked').value;
             if (menuTy === 'BBS') {
-	            for (let i = selectedNode.parents.length - 2; i >= 0; i--) {
-	                let parentNode = $('#tree').jstree().get_node(selectedNode.parents[i]);
-	                urlPath = urlPath + '/' + parentNode.data.menuId;
-	            }
+// 	            for (let i = selectedNode.parents.length - 2; i >= 0; i--) {
+// 	                let parentNode = $('#tree').jstree().get_node(selectedNode.parents[i]);
+// 	                alert(urlPath);
+// 	                urlPath = urlPath + '/' + parentNode.data.menuId;
+// 	            }
 	
 	            let id = document.getElementById('id').value;
-	
-	            urlPath = urlPath + '/' + id;
-                urlPath = urlPath + '/bbs/' + checkRadio.value + '/list';
+	            let parentId = $('#tree').jstree().get_node(selectedNode.parents[0]).data.menuId;
+	            urlPath = '/ft/' + parentId + '/' + id + '/list.do';
             } else if (menuTy === 'PROGRM') {
-                urlPath = '/mber' + urlPath + checkRadio.value;
+                urlPath = urlPath + checkRadio.value;
             }
 
             document.getElementById('url').value = urlPath;

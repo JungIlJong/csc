@@ -1,23 +1,5 @@
 package com.kepco.app.core.security.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kepco.app.core.security.CustomAuthenticationEntryPoint;
-import com.kepco.app.core.security.CustomWebAuthenticationDetailsSource;
-import com.kepco.app.core.security.filter.BbsRoleFilter;
-import com.kepco.app.core.security.filter.CustomIpFilter;
-import com.kepco.app.core.security.filter.CustomLoginProcessingFilter;
-import com.kepco.app.core.security.handler.CustomAccessDeniedHandler;
-import com.kepco.app.core.security.handler.CustomAuthenticationFailureHandler;
-import com.kepco.app.core.security.handler.CustomAuthenticationSuccessHandler;
-import com.kepco.app.core.security.provider.CustomAuthenticationProvider;
-import com.kepco.app.core.security.service.CustomUserDetailsService;
-import com.kepco.app.core.security.util.AuthenticationManagerUtil;
-import com.kepco.app.domain.accessip.service.AccessIpService;
-import com.kepco.app.domain.lgnlog.service.LgnLogService;
-import com.kepco.app.domain.login.service.LoginService;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -33,6 +15,24 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kepco.app.core.security.CustomAuthenticationEntryPoint;
+import com.kepco.app.core.security.CustomWebAuthenticationDetailsSource;
+import com.kepco.app.core.security.filter.CustomIpFilter;
+import com.kepco.app.core.security.filter.CustomLoginProcessingFilter;
+import com.kepco.app.core.security.handler.CustomAccessDeniedHandler;
+import com.kepco.app.core.security.handler.CustomAuthenticationFailureHandler;
+import com.kepco.app.core.security.handler.CustomAuthenticationSuccessHandler;
+import com.kepco.app.core.security.provider.CustomAuthenticationProvider;
+import com.kepco.app.core.security.service.CustomUserDetailsService;
+import com.kepco.app.core.security.util.AuthenticationManagerUtil;
+import com.kepco.app.domain.accessip.service.AccessIpService;
+import com.kepco.app.domain.lgnlog.service.LgnLogService;
+import com.kepco.app.domain.login.service.LoginService;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -50,8 +50,6 @@ public class SecurityConfig {
     private final PasswordEncoder passwordEncoder;
 
     private final LgnLogService lgnLogService;
-
-    private final BbsRoleFilter bbsRoleFilter;
 
 
     @Order(2)
@@ -84,8 +82,7 @@ public class SecurityConfig {
                         .authenticationEntryPoint(customAuthenticationEntryPoint()))
 //                        .accessDeniedHandler(customAccessDeniedHandler()))
                 .addFilterBefore(customIpFilter(), UsernamePasswordAuthenticationFilter.class)
-                .addFilterAfter(customLoginProcessingFilter(authenticationManager), UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(bbsRoleFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterAfter(customLoginProcessingFilter(authenticationManager), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

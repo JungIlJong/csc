@@ -22,21 +22,5 @@ public interface MbrService {
 
     void deleteMbr(String uuid);
 
-    void updateMbrLock(String uuid);
-
-    List<Mbr> selectMbrPushList(Map<String, Object> searchMap);
-
-    int selectMbrPushListTotCnt(Map<String, Object> searchMap);
-
-    List<Mbr> selectMbrPushListAll(Map<String, Object> searchMap);
-
     int countMbrByEmail(Map<String, Object> searchMap);
-
-    void withDrawMbr(String uuid);
-
-    void blockMbr(Long frstRgstId);
-
-    void reportMbr(Long frstRgstId);
-
-    void updateMbrReportIds(String uuid);
 }

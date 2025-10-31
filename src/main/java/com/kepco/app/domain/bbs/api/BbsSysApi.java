@@ -1,18 +1,13 @@
 package com.kepco.app.domain.bbs.api;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kepco.app.common.CommonResponse;
-import com.kepco.app.core.security.util.UserDetailsUtil;
-import com.kepco.app.core.util.SearchUtil;
-import com.kepco.app.core.vo.LoginVO;
-import com.kepco.app.domain.bbs.dto.InsertSysBbs;
-import com.kepco.app.domain.bbs.dto.SearchBbs;
-import com.kepco.app.domain.bbs.dto.SysBbs;
-import com.kepco.app.domain.bbs.dto.UpdateSysBbs;
-import com.kepco.app.domain.bbs.service.BbsRoleSysService;
-import com.kepco.app.domain.bbs.service.BbsSysService;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import lombok.extern.slf4j.Slf4j;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
 import org.egovframe.rte.fdl.cmmn.exception.FdlException;
 import org.egovframe.rte.fdl.property.EgovPropertyService;
 import org.egovframe.rte.ptl.mvc.tags.ui.pagination.PaginationInfo;
@@ -26,13 +21,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import javax.validation.constraints.Size;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kepco.app.common.CommonResponse;
+import com.kepco.app.core.security.util.UserDetailsUtil;
+import com.kepco.app.core.util.SearchUtil;
+import com.kepco.app.core.vo.LoginVO;
+import com.kepco.app.domain.bbs.dto.InsertSysBbs;
+import com.kepco.app.domain.bbs.dto.SysBbs;
+import com.kepco.app.domain.bbs.dto.UpdateSysBbs;
+import com.kepco.app.domain.bbs.service.BbsSysService;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 관리자가 게시판을 관리하기 위한 API 클래스
@@ -57,14 +56,12 @@ import java.util.Map;
 @RequestMapping("/api/sys/bbs")
 public class BbsSysApi {
     private final BbsSysService bbsSysService;
-    private final BbsRoleSysService bbsRoleSysService;
     private final EgovPropertyService propertiesService;
     private final ModelMapper modelMapper;
     private final ObjectMapper objectMapper;
 
-    public BbsSysApi(BbsSysService bbsSysService, BbsRoleSysService bbsRoleSysService, EgovPropertyService propertiesService, ModelMapper modelMapper, ObjectMapper objectMapper) {
+    public BbsSysApi(BbsSysService bbsSysService, EgovPropertyService propertiesService, ModelMapper modelMapper, ObjectMapper objectMapper) {
         this.bbsSysService = bbsSysService;
-        this.bbsRoleSysService = bbsRoleSysService;
         this.propertiesService = propertiesService;
         this.modelMapper = modelMapper;
         this.objectMapper = objectMapper;
@@ -127,11 +124,10 @@ public class BbsSysApi {
     @GetMapping("/list")
     public ResponseEntity apiSysSelectBbsList(@RequestParam Map<String, Object> reqMap) {
         Map<String, Object> searchMap = new HashMap<>();
-        String[] columns = {"BBS_ID", "BBS_TY_CODE", "BBS_NM", "FRST_REGIST_DT", "USE_AT", ""};
+        String[] columns = {"BBS_ID", "BBS_NM", "FRST_REGIST_DT", "USE_AT", ""};
 
         searchMap.put("maxDate", reqMap.get("maxDate"));
         searchMap.put("minDate", reqMap.get("minDate"));
-        searchMap.put("bbsTyCode", reqMap.get("bbsTyCode"));
         searchMap.put("searchKeyword", reqMap.get("search[value]"));
         int start = Integer.parseInt((String) reqMap.get("start"));
         int length = Integer.parseInt((String) reqMap.get("length"));
@@ -151,7 +147,6 @@ public class BbsSysApi {
         int filterTotCnt = bbsSysService.selectBbsListTotCnt(searchMap);
         searchMap.put("maxDate", "");
         searchMap.put("minDate", "");
-        searchMap.put("bbsTyCode", "");
         searchMap.put("searchKeyword", "");
         int totCnt = bbsSysService.selectBbsListTotCnt(searchMap);
 
@@ -174,7 +169,6 @@ public class BbsSysApi {
     public ResponseEntity apiSysSelectBbsDetail(@RequestParam String bbsId) {
         Map<String, Object> result = new HashMap<>();
         result.put("data", bbsSysService.selectBbsDetail(bbsId));
-        result.put("roles", bbsRoleSysService.selectBbsRole(bbsId));
         return CommonResponse.success(result);
     }
 
@@ -187,16 +181,6 @@ public class BbsSysApi {
     @GetMapping("/info")
     public ResponseEntity apiSysSelectBbsPermissionInfo(@RequestParam String bbsId) {
         return CommonResponse.success(bbsSysService.selectBbsPermissionInfo(bbsId));
-    }
-
-    /**
-     * 모든 권한 목록을 조회한다.
-     *
-     * @return 권한 리스트
-     */
-    @GetMapping("/role/all")
-    public ResponseEntity selectRoleListAll() {
-        return CommonResponse.success(bbsRoleSysService.selectRoleListAll());
     }
 
     @GetMapping("/all")

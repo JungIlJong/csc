@@ -66,33 +66,4 @@ public class MbrApi {
 
         return CommonResponse.success(insertMbr);
     }
-
-    /**
-     * 사용자를 신고한다.
-     */
-    @PostMapping("/mber/report")
-    public ResponseEntity report(@RequestBody @Valid SaveMbr.Report report) {
-        // 관리자 계정은 신고 불가능하도록 수정
-        List<Long> adminList = new ArrayList<>();
-        // 신고 불가 ID 수동 추가
-        adminList.add(1L);
-
-        if (adminList.contains(report.getFrstRgstId())) {
-            return CommonResponse.error(CommonErrorCode.BAD_REQUEST);
-        }
-        mbrService.reportMbr(report.getFrstRgstId());
-        return ResponseEntity.ok(Collections.EMPTY_LIST);
-    }
-
-    /**
-     * 사용자를 차단한다.
-     */
-    @PostMapping("/mber/block")
-    public ResponseEntity block(@RequestBody @Valid SaveMbr.Block block) {
-        if (block.getFrstRgstId() == 1L) {
-            return CommonResponse.error(CommonErrorCode.BAD_REQUEST);
-        }
-        mbrService.blockMbr(block.getFrstRgstId());
-        return ResponseEntity.ok(Collections.EMPTY_LIST);
-    }
 }
